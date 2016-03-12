@@ -34,6 +34,7 @@ request.post(accessTokenUrl, { form: params, json: true }, function(err, respons
 
   // Step 2. Retrieve profile information about the current user.
   request.get({ url: peopleApiUrl, qs: params, json: true }, function(err, response, profile) {
+    console.log(profile);
   });
 });
 });
