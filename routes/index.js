@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var request = require('request');
+var unirest = require('unirest');
 require('dotenv').load();
 
 
@@ -8,6 +9,7 @@ require('dotenv').load();
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
+
 
 router.post('/auth/linkedin', function(req, res) {
   var accessTokenUrl = 'https://www.linkedin.com/uas/oauth2/accessToken';
@@ -23,7 +25,6 @@ router.post('/auth/linkedin', function(req, res) {
 
   // Step 1. Exchange authorization code for access token.
 request.post(accessTokenUrl, { form: params, json: true }, function(err, response, body) {
-  console.log('this is me localizing the problem');
   if (response.statusCode !== 200) {
     return res.status(response.statusCode).send({ message: body.error_description });
   }
@@ -35,7 +36,16 @@ request.post(accessTokenUrl, { form: params, json: true }, function(err, respons
   // Step 2. Retrieve profile information about the current user.
   request.get({ url: peopleApiUrl, qs: params, json: true }, function(err, response, profile) {
     console.log(profile);
+    res.send(profile);
+    // Step 3. Make unirest call to database with linkedin information for each user
+    unirest.post('https://buildyournetwork.herokuapp.com/')
+    .header('Accept', 'package/json')
+    .send(profile)
+    .end(function (response){
+      res.send(response);
+    });
   });
+  // Step 4. 
 });
-});
+
 module.exports = router;
