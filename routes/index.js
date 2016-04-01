@@ -21,7 +21,6 @@ router.post('/auth/linkedin', function(req, res) {
     client_secret: process.env.LINKEDIN_SECRET,
     redirect_uri: req.body.redirectUri
   };
-  console.log(params);
 
   // Step 1. Exchange authorization code for access token.
 request.post(accessTokenUrl, { form: params, json: true }, function(err, response, body) {
@@ -36,16 +35,19 @@ request.post(accessTokenUrl, { form: params, json: true }, function(err, respons
   // Step 2. Retrieve profile information about the current user.
   request.get({ url: peopleApiUrl, qs: params, json: true }, function(err, response, profile) {
     console.log(profile);
-    res.send(profile);
+    // res.send(profile);
     // Step 3. Make unirest call to database with linkedin information for each user
-    unirest.post('https://buildyournetwork.herokuapp.com/')
+    unirest.post('https://buildyournetwork.herokuapp.com/users')
     .header('Accept', 'package/json')
     .send(profile)
     .end(function (response){
+      console.log('************');
+      console.log(response);
       res.send(response);
     });
   });
-  // Step 4. 
+  });
 });
+  // Step 4.
 
 module.exports = router;
